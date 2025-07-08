@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stopwatch Web App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #eaf4fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .stopwatch-container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 320px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .display {
+      font-size: 2em;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .buttons button {
+      margin: 6px;
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .start { background: #28a745; color: white; }
+    .pause { background: #ffc107; color: white; }
+    .reset { background: #dc3545; color: white; }
+    .lap   { background: #007bff; color: white; }
+
+    .buttons button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .laps {
+      text-align: left;
+      margin-top: 20px;
+      max-height: 150px;
+      overflow-y: auto;
+      padding: 0;
+      list-style-type: none;
+      border-top: 1px solid #ccc;
+    }
+
+    .laps li {
+      padding: 6px;
+      border-bottom: 1px dashed #ddd;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stopwatch-container">
+    <h1>Stopwatch</h1>
+    <div class="display" id="display">00:00:00:00</div>
+    
+    <div class="buttons">
+      <button class="start" onclick="startTimer()" id="startBtn">Start</button>
+      <button class="pause" onclick="pauseTimer()" id="pauseBtn" disabled>Pause</button>
+      <button class="reset" onclick="resetTimer()" id="resetBtn" disabled>Reset</button>
+      <button class="lap" onclick="recordLap()" id="lapBtn" disabled>Lap</button>
+    </div>
+
+    <ul class="laps" id="laps"></ul>
+  </div>
+
+  <script>
+    let startTime = 0;
+    let elapsed = 0;
+    let timerInterval = null;
+
+    const display = document.getElementById("display");
+    const laps = document.getElementById("laps");
+
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const lapBtn = document.getElementById("lapBtn");
+
+    function formatTime(ms) {
+      const milliseconds = Math.floor((ms % 1000) / 10);
+      const seconds = Math.floor((ms / 1000) % 60);
+      const minutes = Math.floor((ms / 60000) % 60);
+      const hours = Math.floor(ms / 3600000);
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
+    }
+
+    function updateDisplay() {
+      display.textContent = formatTime(elapsed);
+    }
+
+    function startTimer() {
+      startTime = Date.now() - elapsed;
+      timerInterval = setInterval(() => {
+        elapsed = Date.now() - startTime;
+        updateDisplay();
+      }, 10);
+
+      // Button states
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+      resetBtn.disabled = false;
+      lapBtn.disabled = false;
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      lapBtn.disabled = true;
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      elapsed = 0;
+      updateDisplay();
+      laps.innerHTML = "";
+
+      // Reset buttons
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      resetBtn.disabled = true;
+      lapBtn.disabled = true;
+    }
+
+    function recordLap() {
+      const li = document.createElement("li");
+      li.textContent = `Lap ${laps.children.length + 1}: ${formatTime(elapsed)}`;
+      laps.appendChild(li);
+      laps.scrollTop = laps.scrollHeight;
+    }
+  </script>
+
+</body>
+</html>
