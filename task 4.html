@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      padding: 30px;
+    }
+    .app {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 16px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #f9f9f9;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .task-info {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .completed {
+      text-decoration: line-through;
+      color: #888;
+    }
+    .time {
+      font-size: 0.8em;
+      color: #777;
+    }
+    .actions button {
+      margin-left: 5px;
+      background: #6c757d;
+    }
+    .actions button.edit {
+      background: #28a745;
+    }
+    .actions button.done {
+      background: #17a2b8;
+    }
+    .actions button:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h2>📝 To-Do List</h2>
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="Enter a new task..." />
+      <button onclick="addTask()">Add</button>
+    </div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    let tasks = [];
+
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      const text = input.value.trim();
+      if (text === '') return;
+
+      const time = new Date().toLocaleString();
+      tasks.push({ text, time, completed: false });
+      input.value = '';
+      renderTasks();
+    }
+
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+
+        const info = document.createElement('div');
+        info.className = 'task-info';
+        info.innerHTML = `
+          <div class="${task.completed ? 'completed' : ''}">${task.text}</div>
+          <div class="time">${task.time}</div>
+        `;
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        actions.innerHTML = `
+          <button class="done" onclick="toggleDone(${index})">✔</button>
+          <button class="edit" onclick="editTask(${index})">✏️</button>
+          <button onclick="deleteTask(${index})">🗑</button>
+        `;
+
+        li.appendChild(info);
+        li.appendChild(actions);
+        list.appendChild(li);
+      });
+    }
+
+    function toggleDone(index) {
+      tasks[index].completed = !tasks[index].completed;
+      renderTasks();
+    }
+
+    function editTask(index) {
+      const newText = prompt("Edit your task:", tasks[index].text);
+      if (newText !== null && newText.trim() !== '') {
+        tasks[index].text = newText.trim();
+        renderTasks();
+      }
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      renderTasks();
+    }
+  </script>
+</body>
+</html>
